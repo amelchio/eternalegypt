@@ -11,6 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @attr.s
 class SMS:
+    id = attr.ib()
     timestamp = attr.ib()
     unread = attr.ib()
     sender = attr.ib()
@@ -90,8 +91,9 @@ class LB2120:
                 for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
                     # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik', 'sender': '555-987-654', 'read': False}
                     dt = datetime.datetime.strptime(msg['rxTime'], '%d/%m/%y %I:%M:%S %p')
-                    element = SMS(dt, not msg['read'], msg['sender'], msg['text'])
+                    element = SMS(int(msg['id']), dt, not msg['read'], msg['sender'], msg['text'])
                     result.sms.append(element)
+                result.sms.sort(key=lambda sms:sms.id)
 
         await session.close()
 
