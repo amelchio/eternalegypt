@@ -76,6 +76,20 @@ class LB2120:
             async with self.websession.post(url, data=data) as response:
                 _LOGGER.debug("Sent message with status %d", response.status)
 
+    async def delete_sms(self, sms_id):
+        """Delete a message."""
+
+        async with async_timeout.timeout(10):
+            url = self.url('Forms/config')
+            data = {
+                'sms.deleteId': sms_id,
+                'err_redirect': '/error.json',
+                'ok_redirect': '/success.json',
+                'token': self.token
+            }
+            async with self.websession.post(url, data=data) as response:
+                _LOGGER.debug("Delete %d with status %d", sms_id, response.status)
+
     async def information(self):
         """Return the SMS inbox."""
         result = Information()
