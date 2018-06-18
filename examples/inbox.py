@@ -4,6 +4,7 @@
 
 import sys
 import asyncio
+import aiohttp
 import logging
 import pprint
 
@@ -14,13 +15,17 @@ logging.basicConfig(level=logging.DEBUG)
 
 async def get_information():
     """Example of printing the inbox."""
-    modem = eternalegypt.LB2120(
-        hostname=sys.argv[1],
-        password=sys.argv[2])
+    jar = aiohttp.CookieJar(unsafe=True)
+    websession = aiohttp.ClientSession(cookie_jar=jar)
+
+    modem = eternalegypt.LB2120(websession=websession)
+    await modem.login(hostname=sys.argv[1], password=sys.argv[2])
 
     result = await modem.information()
     for sms in result.sms:
         pprint.pprint(sms)
+
+    await websession.close()
 
 if len(sys.argv) != 3:
     print("{}: <lb2120 ip> <lb2120 password>".format(sys.argv[0]))

@@ -4,6 +4,7 @@
 
 import sys
 import asyncio
+import aiohttp
 import logging
 
 import eternalegypt
@@ -13,11 +14,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 async def send_message():
     """Example of sending a message."""
-    modem = eternalegypt.LB2120(
-        hostname=sys.argv[1],
-        password=sys.argv[2])
+    jar = aiohttp.CookieJar(unsafe=True)
+    websession = aiohttp.ClientSession(cookie_jar=jar)
+
+    modem = eternalegypt.LB2120(websession=websession)
+    await modem.login(hostname=sys.argv[1], password=sys.argv[2])
 
     await modem.sms(phone=sys.argv[3], message=sys.argv[4])
+
+    await websession.close()
 
 if len(sys.argv) != 5:
     print("{}: <lb2120 ip> <lb2120 password> <phone> <message>".format(
