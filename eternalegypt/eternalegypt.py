@@ -25,9 +25,9 @@ class Information:
 class LB2120:
     """Class for Netgear LB2120 interface."""
 
+    hostname = attr.ib()
     websession = attr.ib()
 
-    hostname = attr.ib(init=False)
     token = attr.ib(init=False)
 
     @property
@@ -38,9 +38,7 @@ class LB2120:
         """Build a complete URL for the device."""
         return self.baseurl + path
 
-    async def login(self, hostname, password):
-        self.hostname = hostname
-
+    async def login(self, password):
         async with async_timeout.timeout(10):
             url = self.url('index.html')
             async with self.websession.get(url) as response:
@@ -109,3 +107,6 @@ class LB2120:
                 result.sms.sort(key=lambda sms:sms.id)
 
         return result
+
+class Modem(LB2120):
+    """Class for any modem."""

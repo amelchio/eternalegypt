@@ -18,8 +18,8 @@ async def get_information():
     jar = aiohttp.CookieJar(unsafe=True)
     websession = aiohttp.ClientSession(cookie_jar=jar)
 
-    modem = eternalegypt.LB2120(websession=websession)
-    await modem.login(hostname=sys.argv[1], password=sys.argv[2])
+    modem = eternalegypt.Modem(hostname=sys.argv[1], websession=websession)
+    await modem.login(password=sys.argv[2])
 
     result = await modem.information()
     for sms in result.sms:

@@ -1,1 +1,1 @@
-from .eternalegypt import LB2120
+from .eternalegypt import Modem
