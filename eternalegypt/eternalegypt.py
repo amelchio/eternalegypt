@@ -3,6 +3,7 @@ import logging
 import re
 import json
 import datetime
+import asyncio
 import async_timeout
 import attr
 
@@ -30,6 +31,8 @@ class LB2120:
 
     token = attr.ib(init=False)
 
+    task = attr.ib(init=False, default=None)
+
     @property
     def baseurl(self):
         return "http://{}/".format(self.hostname)
@@ -37,6 +40,12 @@ class LB2120:
     def url(self, path):
         """Build a complete URL for the device."""
         return self.baseurl + path
+
+    async def logout(self):
+        """Cleanup resources."""
+        self.websession = None
+        self.token = None
+        await self.cancel_periodic_update()
 
     async def login(self, password):
         async with async_timeout.timeout(10):
@@ -56,6 +65,8 @@ class LB2120:
             }
             async with self.websession.post(url, data=data) as response:
                 _LOGGER.debug("Got cookie with status %d", response.status)
+
+            await self.periodic_update()
 
     async def sms(self, phone, message):
         """Send a message."""
@@ -106,7 +117,35 @@ class LB2120:
                     result.sms.append(element)
                 result.sms.sort(key=lambda sms:sms.id)
 
+        await self.periodic_update()
+
         return result
+
+    async def periodic_update(self):
+        """Update information periodically."""
+        async def update_later():
+            """Update information after a delay if we are still current."""
+            try:
+                await asyncio.sleep(300)
+                self.task = None
+
+                await self.information()
+
+            except asyncio.CancelledError:
+                pass
+
+        await self.cancel_periodic_update()
+
+        loop = asyncio.get_event_loop()
+        self.task = loop.create_task(update_later())
+
+    async def cancel_periodic_update(self):
+        """Cancel a pending update."""
+        if self.task:
+            self.task.cancel()
+            await asyncio.wait([self.task])
+            self.task = None
+
 
 class Modem(LB2120):
     """Class for any modem."""
