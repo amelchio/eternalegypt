@@ -31,6 +31,8 @@ class LB2120:
 
     token = attr.ib(init=False)
 
+    listeners = attr.ib(factory=list)
+    max_sms_id = attr.ib(init=False, default=None)
     task = attr.ib(init=False, default=None)
 
     @property
@@ -40,6 +42,10 @@ class LB2120:
     def url(self, path):
         """Build a complete URL for the device."""
         return self.baseurl + path
+
+    async def add_sms_listener(self, listener):
+        """Add a listener for new SMS."""
+        self.listeners.append(listener)
 
     async def logout(self):
         """Cleanup resources."""
@@ -117,9 +123,25 @@ class LB2120:
                     result.sms.append(element)
                 result.sms.sort(key=lambda sms:sms.id)
 
+        self.sms_events(result)
+
         await self.periodic_update()
 
         return result
+
+    def sms_events(self, information):
+        """Send events for each new SMS."""
+        if not self.listeners:
+            return
+
+        if self.max_sms_id is not None:
+            new_sms = (s for s in information.sms if s.id > self.max_sms_id)
+            for sms in new_sms:
+                for listener in self.listeners:
+                    listener(sms)
+
+        if information.sms:
+            self.max_sms_id = max(s.id for s in information.sms)
 
     async def periodic_update(self):
         """Update information periodically."""
