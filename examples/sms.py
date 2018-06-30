@@ -22,6 +22,7 @@ async def send_message():
 
     await modem.sms(phone=sys.argv[3], message=sys.argv[4])
 
+    await modem.logout()
     await websession.close()
 
 if len(sys.argv) != 5:

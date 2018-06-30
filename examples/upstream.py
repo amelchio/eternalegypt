@@ -23,6 +23,7 @@ async def get_information():
     result = await modem.information()
     print("Upstream: {}".format(result.upstream))
 
+    await modem.logout()
     await websession.close()
 
 if len(sys.argv) != 3:

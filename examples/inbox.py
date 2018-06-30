@@ -25,6 +25,7 @@ async def get_information():
     for sms in result.sms:
         pprint.pprint(sms)
 
+    await modem.logout()
     await websession.close()
 
 if len(sys.argv) != 3:
