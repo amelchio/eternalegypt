@@ -21,6 +21,7 @@ class SMS:
 class Information:
     sms = attr.ib(factory=list)
     usage = attr.ib(default=None)
+    upstream = attr.ib(default=None) # possible values seem to be WAN and LTE
 
 @attr.s
 class LB2120:
@@ -106,7 +107,7 @@ class LB2120:
                 _LOGGER.debug("Delete %d with status %d", sms_id, response.status)
 
     async def information(self):
-        """Return the SMS inbox."""
+        """Return the current information."""
         result = Information()
 
         async with async_timeout.timeout(10):
@@ -115,6 +116,7 @@ class LB2120:
                 data = json.loads(await response.text())
 
                 result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
+                result.upstream = data['failover']['backhaul']
 
                 for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
                     # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik', 'sender': '555-987-654', 'read': False}
