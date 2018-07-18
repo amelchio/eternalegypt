@@ -22,6 +22,7 @@ class Information:
     sms = attr.ib(factory=list)
     usage = attr.ib(default=None)
     upstream = attr.ib(default=None) # possible values seem to be WAN and LTE
+    serial_number = attr.ib(default=None)
 
 @attr.s
 class LB2120:
@@ -117,6 +118,7 @@ class LB2120:
 
                 result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
                 result.upstream = data['failover']['backhaul']
+                result.serial_number = data['general']['FSN']
 
                 for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
                     # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik', 'sender': '555-987-654', 'read': False}
