@@ -26,7 +26,7 @@ async def send_message():
     await websession.close()
 
 if len(sys.argv) != 5:
-    print("{}: <lb2120 ip> <lb2120 password> <phone> <message>".format(
+    print("{}: <netgear ip> <netgear password> <phone> <message>".format(
         sys.argv[0]))
 else:
     asyncio.get_event_loop().run_until_complete(send_message())
