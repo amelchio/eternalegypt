@@ -23,6 +23,18 @@ class Information:
     usage = attr.ib(default=None)
     upstream = attr.ib(default=None) # possible values seem to be WAN and LTE
     serial_number = attr.ib(default=None)
+    connection = attr.ib(default=None)
+    connection_text = attr.ib(default=None)
+    connection_type = attr.ib(default=None)
+    current_nw_service_type = attr.ib(default=None)
+    current_ps_service_type = attr.ib(default=None)
+    register_network_display = attr.ib(default=None)
+    roaming = attr.ib(default=None)
+    radio_quality = attr.ib(default=None)
+    rx_level = attr.ib(default=None)
+    tx_level = attr.ib(default=None)
+    current_band = attr.ib(default=None)
+    cell_id = attr.ib(default=None)
 
 @attr.s
 class LB2120:
@@ -119,6 +131,18 @@ class LB2120:
                 result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
                 result.upstream = data['failover']['backhaul']
                 result.serial_number = data['general']['FSN']
+                result.connection = data['wwan']['connection']
+                result.connection_text = data['wwan']['connectionText']
+                result.connection_type = data['wwan']['connectionType']
+                result.current_nw_service_type = data['wwan']['currentNWserviceType']
+                result.current_ps_service_type = data['wwan']['currentPSserviceType']
+                result.register_network_display = data['wwan']['registerNetworkDisplay']
+                result.roaming = data['wwan']['roaming']
+                result.radio_quality = data['wwanadv']['radioQuality']
+                result.rx_level = data['wwanadv']['rxLevel']
+                result.tx_level = data['wwanadv']['txLevel']
+                result.current_band = data['wwanadv']['curBand']
+                result.cell_id = data['wwanadv']['cellId']
 
                 for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
                     # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik', 'sender': '555-987-654', 'read': False}
