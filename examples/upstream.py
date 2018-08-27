@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Example file for LB2120 library."""
+"""Example file for eternalegypt library."""
 
 import sys
 import asyncio
@@ -27,6 +27,6 @@ async def get_information():
     await websession.close()
 
 if len(sys.argv) != 3:
-    print("{}: <lb2120 ip> <lb2120 password>".format(sys.argv[0]))
+    print("{}: <netgear ip> <netgear password>".format(sys.argv[0]))
 else:
     asyncio.get_event_loop().run_until_complete(get_information())

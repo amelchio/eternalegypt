@@ -12,7 +12,7 @@ setup(
     author_email='amelchio@nogoto.net',
     url='https://github.com/amelchio/eternalegypt',
     license='MIT',
-    keywords=['netgear,lte,lb2120'],
+    keywords=['netgear,lte,lb1120,lb2120'],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
