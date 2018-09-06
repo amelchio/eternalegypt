@@ -1,1 +1,1 @@
-from .eternalegypt import Modem
+from .eternalegypt import Modem, Error
