@@ -212,10 +212,11 @@ class LB2120:
 
         result = Information()
 
+        result.serial_number = data['general']['FSN']
         result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
         result.upstream = data['failover']['backhaul']
-        result.serial_number = data['general']['FSN']
-        result.connection = data['wwan']['connection']
+        result.wire_connected = 'Connected' if data['failover']['wanConnected'] else 'Disconnected'
+        result.mobile_connected = data['wwan']['connection']
         result.connection_text = data['wwan']['connectionText']
         result.connection_type = data['wwan']['connectionType']
         result.current_nw_service_type = data['wwan']['currentNWserviceType']
