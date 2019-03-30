@@ -162,6 +162,12 @@ class LB2120:
         return self.websession.post(url, data=data)
 
     @autologin
+    async def connect_lte(self):
+        """Do an LTE reconnect."""
+        async with self._config_call('wwan.connect', 'DefaultProfile') as response:
+            _LOGGER.debug("Connected to LTE with status %d", response.status)
+
+    @autologin
     async def delete_sms(self, sms_id):
         """Delete a message."""
         async with self._config_call('sms.deleteId', sms_id) as response:
