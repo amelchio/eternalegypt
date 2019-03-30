@@ -150,18 +150,21 @@ class LB2120:
         async with self.websession.post(url, data=data) as response:
             _LOGGER.debug("Sent message with status %d", response.status)
 
-    @autologin
-    async def delete_sms(self, sms_id):
-        """Delete a message."""
-
+    def _config_call(self, key, value):
+        """Set a configuration key to a certain value."""
         url = self._url('Forms/config')
         data = {
-            'sms.deleteId': sms_id,
+            key: value,
             'err_redirect': '/error.json',
             'ok_redirect': '/success.json',
             'token': self.token
         }
-        async with self.websession.post(url, data=data) as response:
+        return self.websession.post(url, data=data)
+
+    @autologin
+    async def delete_sms(self, sms_id):
+        """Delete a message."""
+        async with self._config_call('sms.deleteId', sms_id) as response:
             _LOGGER.debug("Delete %d with status %d", sms_id, response.status)
 
     def _build_information(self, data):
