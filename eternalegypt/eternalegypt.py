@@ -83,7 +83,6 @@ class LB2120:
 
     listeners = attr.ib(init=False, factory=list)
     max_sms_id = attr.ib(init=False, default=None)
-    task = attr.ib(init=False, default=None)
 
     @property
     def _baseurl(self):
@@ -151,19 +150,60 @@ class LB2120:
         async with self.websession.post(url, data=data) as response:
             _LOGGER.debug("Sent message with status %d", response.status)
 
-    @autologin
-    async def delete_sms(self, sms_id):
-        """Delete a message."""
-
+    def _config_call(self, key, value):
+        """Set a configuration key to a certain value."""
         url = self._url('Forms/config')
         data = {
-            'sms.deleteId': sms_id,
+            key: value,
             'err_redirect': '/error.json',
             'ok_redirect': '/success.json',
             'token': self.token
         }
-        async with self.websession.post(url, data=data) as response:
+        return self.websession.post(url, data=data)
+
+    @autologin
+    async def connect_lte(self):
+        """Do an LTE reconnect."""
+        async with self._config_call('wwan.connect', 'DefaultProfile') as response:
+            _LOGGER.debug("Connected to LTE with status %d", response.status)
+
+    @autologin
+    async def delete_sms(self, sms_id):
+        """Delete a message."""
+        async with self._config_call('sms.deleteId', sms_id) as response:
             _LOGGER.debug("Delete %d with status %d", sms_id, response.status)
+
+    @autologin
+    async def set_failover_mode(self, mode):
+        """Set failover mode."""
+        modes = {
+            'auto': 'Auto',
+            'wire': 'WAN',
+            'mobile': 'LTE',
+        }
+
+        if mode not in modes.keys():
+            _LOGGER.error("Invalid mode %s not %s", mode, "/".join(modes.keys()))
+            return
+
+        async with self._config_call('failover.mode', modes[mode]) as response:
+            _LOGGER.debug("Set mode to %s", mode)
+
+    @autologin
+    async def set_autoconnect_mode(self, mode):
+        """Set autoconnect mode."""
+        modes = {
+            'never': 'Never',
+            'home': 'HomeNetwork',
+            'always': 'Always',
+        }
+
+        if mode not in modes.keys():
+            _LOGGER.error("Invalid mode %s not %s", mode, "/".join(modes.keys()))
+            return
+
+        async with self._config_call('wwan.autoconnect', modes[mode]) as response:
+            _LOGGER.debug("Set mode to %s", mode)
 
     def _build_information(self, data):
         """Read the bits we need from returned data."""
@@ -172,10 +212,11 @@ class LB2120:
 
         result = Information()
 
+        result.serial_number = data['general']['FSN']
         result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
         result.upstream = data['failover']['backhaul']
-        result.serial_number = data['general']['FSN']
-        result.connection = data['wwan']['connection']
+        result.wire_connected = 'Connected' if data['failover']['wanConnected'] else 'Disconnected'
+        result.mobile_connected = data['wwan']['connection']
         result.connection_text = data['wwan']['connectionText']
         result.connection_type = data['wwan']['connectionType']
         result.current_nw_service_type = data['wwan']['currentNWserviceType']
