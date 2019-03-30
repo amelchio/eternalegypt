@@ -183,6 +183,22 @@ class LB2120:
         async with self._config_call('failover.mode', modes[mode]) as response:
             _LOGGER.debug("Set mode to %s", mode)
 
+    @autologin
+    async def set_autoconnect_mode(self, mode):
+        """Set autoconnect mode."""
+        modes = {
+            'never': 'Never',
+            'home': 'HomeNetwork',
+            'always': 'Always',
+        }
+
+        if mode not in modes.keys():
+            _LOGGER.error("Invalid mode %s not %s", mode, "/".join(modes.keys()))
+            return
+
+        async with self._config_call('wwan.autoconnect', modes[mode]) as response:
+            _LOGGER.debug("Set mode to %s", mode)
+
     def _build_information(self, data):
         """Read the bits we need from returned data."""
         if 'wwan' not in data:
