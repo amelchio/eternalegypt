@@ -167,6 +167,22 @@ class LB2120:
         async with self._config_call('sms.deleteId', sms_id) as response:
             _LOGGER.debug("Delete %d with status %d", sms_id, response.status)
 
+    @autologin
+    async def set_failover_mode(self, mode):
+        """Set failover mode."""
+        modes = {
+            'auto': 'Auto',
+            'wire': 'WAN',
+            'mobile': 'LTE',
+        }
+
+        if mode not in modes.keys():
+            _LOGGER.error("Invalid mode %s not %s", mode, "/".join(modes.keys()))
+            return
+
+        async with self._config_call('failover.mode', modes[mode]) as response:
+            _LOGGER.debug("Set mode to %s", mode)
+
     def _build_information(self, data):
         """Read the bits we need from returned data."""
         if 'wwan' not in data:
