@@ -83,7 +83,6 @@ class LB2120:
 
     listeners = attr.ib(init=False, factory=list)
     max_sms_id = attr.ib(init=False, default=None)
-    task = attr.ib(init=False, default=None)
 
     @property
     def _baseurl(self):
