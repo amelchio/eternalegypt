@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name='eternalegypt',
     packages=['eternalegypt'],
-    version='0.0.7',
+    version='0.0.8',
     install_requires=['aiohttp>=3.0.1','attrs'],
     description='Netgear LTE modem API',
     author='Anders Melchiorsen',
