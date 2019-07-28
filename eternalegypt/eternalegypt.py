@@ -31,11 +31,11 @@ class SMS:
 @attr.s
 class Information:
     """Various information from the modem."""
-    sms = attr.ib(factory=list)
+    serial_number = attr.ib(default=None)
     usage = attr.ib(default=None)
     upstream = attr.ib(default=None)
-    serial_number = attr.ib(default=None)
-    connection = attr.ib(default=None)
+    wire_connected = attr.ib(default=None)
+    mobile_connected = attr.ib(default=None)
     connection_text = attr.ib(default=None)
     connection_type = attr.ib(default=None)
     current_nw_service_type = attr.ib(default=None)
@@ -47,6 +47,7 @@ class Information:
     tx_level = attr.ib(default=None)
     current_band = attr.ib(default=None)
     cell_id = attr.ib(default=None)
+    sms = attr.ib(factory=list)
 
 
 def autologin(function, timeout=TIMEOUT):
