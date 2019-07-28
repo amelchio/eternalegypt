@@ -117,6 +117,9 @@ class LB2120:
 
                     match = re.search(r'name="token" value="(.*?)"', text)
                     if not match:
+                        match = re.search(r'"secToken": "(.*?)"', text)
+
+                    if not match:
                         _LOGGER.error("No token found during login")
                         raise Error()
 
@@ -215,8 +218,9 @@ class LB2120:
 
         result.serial_number = data['general']['FSN']
         result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
-        result.upstream = data['failover']['backhaul']
-        result.wire_connected = data['failover']['wanConnected']
+        if 'failover' in data:
+            result.upstream = data['failover']['backhaul']
+            result.wire_connected = data['failover']['wanConnected']
         result.mobile_connected = (data['wwan']['connection'] == 'Connected')
         result.connection_text = data['wwan']['connectionText']
         result.connection_type = data['wwan']['connectionType']
