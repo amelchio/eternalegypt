@@ -170,6 +170,12 @@ class LB2120:
         return self.websession.post(url, data=data)
 
     @autologin
+    async def disconnect_lte(self):
+        """Do an LTE disconnect."""
+        async with self._config_call('wwan.connect', 'Disconnect') as response:
+            _LOGGER.debug("Disconnected LTE with status %d", response.status)
+
+    @autologin
     async def connect_lte(self):
         """Do an LTE reconnect."""
         async with self._config_call('wwan.connect', 'DefaultProfile') as response:
