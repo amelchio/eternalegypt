@@ -111,19 +111,15 @@ class LB2120:
 
         try:
             async with async_timeout.timeout(TIMEOUT):
-                url = self._url('index.html')
+                url = self._url('model.json')
                 async with self.websession.get(url) as response:
-                    text = await response.text()
+                    data = json.loads(await response.text())
+                    self.token = data.get('session', {}).get('secToken')
 
-                    match = re.search(r'name="token" value="(.*?)"', text)
-                    if not match:
-                        match = re.search(r'"secToken": "(.*?)"', text)
-
-                    if not match:
+                    if self.token is None:
                         _LOGGER.error("No token found during login")
                         raise Error()
 
-                    self.token = match.group(1)
                     _LOGGER.debug("Token: %s", self.token)
 
                 url = self._url('Forms/config')
