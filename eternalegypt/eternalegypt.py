@@ -8,6 +8,7 @@ import asyncio
 from aiohttp.client_exceptions import ClientError
 import async_timeout
 import attr
+import flatten_json
 
 TIMEOUT = 3
 
@@ -48,6 +49,7 @@ class Information:
     current_band = attr.ib(default=None)
     cell_id = attr.ib(default=None)
     sms = attr.ib(factory=list)
+    everything = attr.ib(factory=dict)
 
 
 def autologin(function, timeout=TIMEOUT):
@@ -251,6 +253,12 @@ class LB2120:
             element = SMS(int(msg['id']), dt, not msg['read'], msg['sender'], msg['text'])
             result.sms.append(element)
         result.sms.sort(key=lambda sms: sms.id)
+
+        result.everything = {
+            key.lower(): value
+            for key, value in flatten_json.flatten(data, '.').items()
+            if value != {}
+        }
 
         return result
 
