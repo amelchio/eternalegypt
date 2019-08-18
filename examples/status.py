@@ -37,7 +37,7 @@ async def get_information():
             print("cell_id: {}".format(result.cell_id))
         else:
             key = sys.argv[3]
-            print("{}: {}".format(key, result.everything.get(key)))
+            print("{}: {}".format(key, result.items.get(key)))
 
         await modem.logout()
     except eternalegypt.Error:
