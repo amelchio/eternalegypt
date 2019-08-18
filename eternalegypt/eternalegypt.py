@@ -49,7 +49,7 @@ class Information:
     current_band = attr.ib(default=None)
     cell_id = attr.ib(default=None)
     sms = attr.ib(factory=list)
-    everything = attr.ib(factory=dict)
+    items = attr.ib(factory=dict)
 
 
 def autologin(function, timeout=TIMEOUT):
@@ -254,10 +254,13 @@ class LB2120:
             result.sms.append(element)
         result.sms.sort(key=lambda sms: sms.id)
 
-        result.everything = {
+        result.items = {
             key.lower(): value
             for key, value in flatten_json.flatten(data, '.').items()
             if value != {}
+            and not re.search(r'\.\d+\.', key)
+            and not re.search(r'\.end$', key)
+            and key.lower() not in ('webd.adminpassword', 'session.sectoken', 'wifi.guest.passphrase', 'wifi.passphrase')
         }
 
         return result
