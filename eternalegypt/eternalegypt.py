@@ -223,9 +223,6 @@ class LB2120:
 
     def _build_information(self, data):
         """Read the bits we need from returned data."""
-        if 'wwan' not in data:
-            raise Error()
-
         result = Information()
 
         result.serial_number = data['general']['FSN']
@@ -269,7 +266,11 @@ class LB2120:
         async with self.websession.get(url) as response:
             data = json.loads(await response.text())
 
-            result = self._build_information(data)
+            try:
+                result = self._build_information(data)
+            except KeyError:
+                _LOGGER.debug("Failed to read information: %s", data)
+                raise Error()
 
             self._sms_events(result)
 
