@@ -244,10 +244,19 @@ class LB2120:
         result.current_band = data['wwanadv']['curBand']
         result.cell_id = data['wwanadv']['cellId']
 
+        mdy_models = ('MR1100')
+
         for msg in [m for m in data['sms']['msgs'] if 'text' in m]:
             # {'id': '6', 'rxTime': '11/03/18 08:18:11 PM', 'text': 'tak tik',
             #  'sender': '555-987-654', 'read': False}
-            dt = datetime.strptime(msg['rxTime'], '%d/%m/%y %I:%M:%S %p')
+            try:
+                if ('model' in data['general'] and data['general']['model'] in mdy_models):
+                    dt = datetime.strptime(msg['rxTime'], '%m/%d/%y %I:%M:%S %p')
+                else:
+                    dt = datetime.strptime(msg['rxTime'], '%d/%m/%y %I:%M:%S %p')
+            except ValueError:
+                dt = None
+
             element = SMS(int(msg['id']), dt, not msg['read'], msg['sender'], msg['text'])
             result.sms.append(element)
         result.sms.sort(key=lambda sms: sms.id)
