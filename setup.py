@@ -6,7 +6,7 @@ setup(
     name='eternalegypt',
     packages=['eternalegypt'],
     version='0.0.11',
-    install_requires=['aiohttp>=3.0.1','attrs','flatten-json'],
+    install_requires=['aiohttp>=3.0.1','attrs'],
     description='Netgear LTE modem API',
     author='Anders Melchiorsen',
     author_email='amelchio@nogoto.net',

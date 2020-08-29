@@ -8,7 +8,6 @@ import asyncio
 from aiohttp.client_exceptions import ClientError
 import async_timeout
 import attr
-import flatten_json
 
 TIMEOUT = 3
 
@@ -266,12 +265,9 @@ class LB2120:
         result.sms.sort(key=lambda sms: sms.id)
 
         result.items = {
-            key.lower(): value
-            for key, value in flatten_json.flatten(data, '.').items()
-            if value != {}
-            and not re.search(r'\.\d+\.', key)
-            and not re.search(r'\.end$', key)
-            and key.lower() not in ('webd.adminpassword', 'session.sectoken', 'wifi.guest.passphrase', 'wifi.passphrase')
+            key: value
+            for key, value in flatten(data).items()
+            if key not in ('webd.adminpassword', 'session.sectoken', 'wifi.guest.passphrase', 'wifi.passphrase')
         }
 
         return result
@@ -311,3 +307,13 @@ class LB2120:
 
 class Modem(LB2120):
     """Class for any modem."""
+
+def flatten(obj, path=""):
+    """Flatten nested dicts into hierarchical keys."""
+    result = {}
+    if isinstance(obj, dict):
+        for key, item in obj.items():
+            result.update(flatten(item, path=(path + "." if path else "") + key.lower()))
+    elif isinstance(obj, (str, int, float, bool)):
+        result[path] = obj
+    return result
