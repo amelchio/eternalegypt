@@ -281,8 +281,9 @@ class LB2120:
 
             try:
                 result = self._build_information(data)
-            except KeyError:
-                _LOGGER.debug("Failed to read information: %s", data)
+                _LOGGER.debug("Did read information: %s", data)
+            except KeyError as ex:
+                _LOGGER.debug("Failed to read information (%s): %s", ex, data)
                 raise Error()
 
             self._sms_events(result)
