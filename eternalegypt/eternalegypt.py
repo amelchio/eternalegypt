@@ -57,6 +57,10 @@ def autologin(function, timeout=TIMEOUT):
     @wraps(function)
     async def wrapper(self, *args, **kwargs):
         """Wrap a function with timeout."""
+        if self.websession is None:
+            _LOGGER.debug("Already logged out")
+            return
+
         try:
             async with async_timeout.timeout(timeout):
                 return await function(self, *args, **kwargs)
