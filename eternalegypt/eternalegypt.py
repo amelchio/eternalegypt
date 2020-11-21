@@ -224,6 +224,12 @@ class LB2120:
         async with self._config_call('wwan.autoconnect', modes[mode]) as response:
             _LOGGER.debug("Set mode to %s", mode)
 
+    @autologin
+    async def router_restart(self):
+        """Do a device restart."""
+        async with self._config_call('general.shutdown', 'restart') as response:
+            _LOGGER.debug("Router restart %d", response.status)
+
     def _build_information(self, data):
         """Read the bits we need from returned data."""
         result = Information()
