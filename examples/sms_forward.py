@@ -17,7 +17,11 @@ async def wait_for_messages():
     modem = eternalegypt.Modem(hostname=sys.argv[1], websession=websession)
     await modem.login(password=sys.argv[2])
     def forward_sms(sms):
-        asyncio.get_event_loop().create_task(modem.sms(phone=sys.argv[3], message=f"{sms.sender}: {sms.message}"))
+        if sms.sender == sys.argv[3]:
+            phone, message = sms.message.split(": ", 1)
+            asyncio.get_event_loop().create_task(modem.sms(phone=phone, message=message))
+        else:
+            asyncio.get_event_loop().create_task(modem.sms(phone=sys.argv[3], message=f"{sms.sender}: {sms.message}"))
     await modem.add_sms_listener(forward_sms)
 
     try:
