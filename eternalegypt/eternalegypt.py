@@ -230,6 +230,13 @@ class LB2120:
         async with self._config_call('general.shutdown', 'restart') as response:
             _LOGGER.debug("Router restart %d", response.status)
 
+    @autologin
+    async def factory_reset(self):
+        """Do a factory reset."""
+        async with self._config_call('general.factoryReset', 1) as response:
+            _LOGGER.debug("Factory reset %d", response.status)
+
+
     def _build_information(self, data):
         """Read the bits we need from returned data."""
         result = Information()
