@@ -35,6 +35,7 @@ async def get_information():
             print("tx_level: {}".format(result.tx_level))
             print("current_band: {}".format(result.current_band))
             print("cell_id: {}".format(result.cell_id))
+            print("signal: {}".format(result.signal))
         else:
             key = sys.argv[3]
             print("{}: {}".format(key, result.items.get(key)))
