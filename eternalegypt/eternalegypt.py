@@ -27,6 +27,30 @@ class SMS:
     sender = attr.ib()
     message = attr.ib()
 
+@attr.s
+class Signal:
+    """See the following page for good summary of these numbers:
+    https://wiki.teltonika-networks.com/view/Mobile_Signal_Strength_Recommendations#Signal_Measurement
+    """
+
+    """Summary of overall signal quality - 5 good, 1 bad, 0 no signal"""
+    bars = attr.ib(default=None)
+
+    """Indicates the downlink carrier-to-interference ratio (signal quality)"""
+    ecio = attr.ib(default=None)
+
+    """Received Signal Code Power - how strong the signal is"""
+    rscp = attr.ib(default=None)
+
+    """Received Signal Received Quality - the quality of the signal, regardless of strength."""
+    rsrq = attr.ib(default=None)
+
+    """Received Signal Strength Indicator. 0 is strong, -100 is poor."""
+    rssi = attr.ib(default=None)
+
+    """Signal-to-interference-plus-noise ratio"""
+    sinr = attr.ib(default=None)
+
 
 @attr.s
 class Information:
@@ -49,6 +73,7 @@ class Information:
     cell_id = attr.ib(default=None)
     sms = attr.ib(factory=list)
     items = attr.ib(factory=dict)
+    signal = attr.ib(default=None)
 
 
 def autologin(function, timeout=TIMEOUT):
@@ -259,6 +284,19 @@ class LB2120:
         result.tx_level = data['wwanadv']['txLevel']
         result.current_band = data['wwanadv']['curBand']
         result.cell_id = data['wwanadv']['cellId']
+
+        if 'signalStrength' in data['wwan']:
+            signal = Signal()
+
+            signal.bars = data['wwan']['signalStrength']['bars']
+            signal.ecio = data['wwan']['signalStrength']['ecio']
+            signal.rscp = data['wwan']['signalStrength']['rscp']
+            signal.rsrq = data['wwan']['signalStrength']['rsrq']
+            signal.rsrp = data['wwan']['signalStrength']['rsrp']
+            signal.rssi = data['wwan']['signalStrength']['rssi']
+            signal.sinr = data['wwan']['signalStrength']['sinr']
+
+            result.signal = signal
 
         mdy_models = ('MR1100')
 
