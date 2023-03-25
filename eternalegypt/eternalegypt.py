@@ -244,9 +244,8 @@ class LB2120:
         result.serial_number = data['general']['FSN']
         result.usage = data['wwan']['dataUsage']['generic']['dataTransferred']
         if 'failover' in data:
-            if 'backhaul' in data['failover']:
-                result.upstream = data['failover']['backhaul']
-            result.wire_connected = data['failover']['wanConnected']
+            result.upstream = data['failover'].get('backhaul')
+            result.wire_connected = data['failover'].get('wanConnected')
         result.mobile_connected = (data['wwan']['connection'] == 'Connected')
         result.connection_text = data['wwan']['connectionText']
         result.connection_type = data['wwan']['connectionType']
