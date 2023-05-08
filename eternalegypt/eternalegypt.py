@@ -308,13 +308,14 @@ class LB2120:
             return
 
         if self.max_sms_id is not None:
-            new_sms = (s for s in information.sms if s.id > self.max_sms_id)
-            for sms in new_sms:
+            for sms in (s for s in information.sms if s.id > self.max_sms_id):
                 for listener in self.listeners:
                     listener(sms)
 
         if information.sms:
             self.max_sms_id = max(s.id for s in information.sms)
+        else:
+            self.max_sms_id = 0
 
 
 class Modem(LB2120):
