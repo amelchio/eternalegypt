@@ -308,7 +308,8 @@ class LB2120:
             return
 
         if self.max_sms_id is not None:
-            for sms in (s for s in information.sms if s.id > self.max_sms_id):
+            new_sms = (s for s in information.sms if s.id > self.max_sms_id)
+            for sms in new_sms:
                 for listener in self.listeners:
                     listener(sms)
 
