@@ -315,6 +315,8 @@ class LB2120:
 
         if information.sms:
             self.max_sms_id = max(s.id for s in information.sms)
+        else:
+            self.max_sms_id = 0
 
 
 class Modem(LB2120):
