@@ -6,7 +6,6 @@ from functools import wraps
 from datetime import datetime
 import asyncio
 from aiohttp.client_exceptions import ClientError
-import async_timeout
 import attr
 
 TIMEOUT = 3
@@ -61,14 +60,14 @@ def autologin(function, timeout=TIMEOUT):
             return
 
         try:
-            async with async_timeout.timeout(timeout):
+            async with asyncio.timeout(timeout):
                 return await function(self, *args, **kwargs)
         except (asyncio.TimeoutError, ClientError, Error):
             pass
 
         _LOGGER.debug("autologin")
         try:
-            async with async_timeout.timeout(timeout):
+            async with asyncio.timeout(timeout):
                 await self.login()
                 return await function(self, *args, **kwargs)
         except (asyncio.TimeoutError, ClientError, Error):
@@ -115,7 +114,7 @@ class LB2120:
             self.password = password
 
         try:
-            async with async_timeout.timeout(TIMEOUT):
+            async with asyncio.timeout(TIMEOUT):
                 url = self._url('model.json')
                 async with self.websession.get(url) as response:
                     data = json.loads(await response.text())
