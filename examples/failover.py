@@ -29,4 +29,4 @@ async def set_failover_mode(mode):
 if len(sys.argv) != 4:
     print("{}: <netgear ip> <netgear password> <mode>".format(sys.argv[0]))
 else:
-    asyncio.get_event_loop().run_until_complete(set_failover_mode(sys.argv[3]))
+    asyncio.run(set_failover_mode(sys.argv[3]))

@@ -29,4 +29,4 @@ if len(sys.argv) != 5:
     print("{}: <netgear ip> <netgear password> <phone> <message>".format(
         sys.argv[0]))
 else:
-    asyncio.get_event_loop().run_until_complete(send_message())
+    asyncio.run(send_message())
