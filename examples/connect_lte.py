@@ -10,7 +10,7 @@ import logging
 import eternalegypt
 
 async def connect():
-    """Example of printing the current upstream."""
+    """Example of doing an LTE reconnect.."""
     jar = aiohttp.CookieJar(unsafe=True)
     websession = aiohttp.ClientSession(cookie_jar=jar)
 
