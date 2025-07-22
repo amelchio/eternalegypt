@@ -109,14 +109,6 @@ class LB2120:
 
     async def login(self, password=None):
         """Create a session with the modem."""
-        # Work around missing https://github.com/aio-libs/aiohttp/pull/3576
-        try:
-            await self._login(password)
-        except (asyncio.TimeoutError, ClientError, Error):
-            await self._login(password)
-
-    async def _login(self, password=None):
-        """Create a session with the modem."""
         if password is None:
             password = self.password
         else:
