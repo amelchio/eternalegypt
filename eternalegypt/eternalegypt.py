@@ -113,6 +113,9 @@ class LB2120:
         else:
             self.password = password
 
+        self.token = None
+        self.websession.cookie_jar.clear(lambda cookie: cookie['domain'] == self.hostname)
+
         try:
             async with asyncio.timeout(TIMEOUT):
                 url = self._url('model.json')
