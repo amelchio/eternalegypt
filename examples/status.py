@@ -48,4 +48,4 @@ async def get_information():
 if len(sys.argv) not in (3, 4):
     print("{}: <netgear ip> <netgear password> [key]".format(sys.argv[0]))
 else:
-    asyncio.get_event_loop().run_until_complete(get_information())
+    asyncio.run(get_information())

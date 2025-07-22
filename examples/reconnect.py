@@ -38,4 +38,4 @@ async def reconnect():
 if len(sys.argv) != 3:
     print("{}: <netgear ip> <netgear password>".format(sys.argv[0]))
 else:
-    asyncio.get_event_loop().run_until_complete(reconnect())
+    asyncio.run(reconnect())
