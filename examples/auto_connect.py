@@ -10,7 +10,7 @@ import logging
 import eternalegypt
 
 async def set_autoconnect_mode(mode):
-    """Example of printing the current upstream."""
+    """Example of setting the autoconnect mode."""
     jar = aiohttp.CookieJar(unsafe=True)
     websession = aiohttp.ClientSession(cookie_jar=jar)
 
@@ -27,6 +27,6 @@ async def set_autoconnect_mode(mode):
     await websession.close()
 
 if len(sys.argv) != 4:
-    print("{}: <netgear ip> <netgear password> <mode>".format(sys.argv[0]))
+    print("{}: <netgear ip> <netgear password> <mode: never|home|always>".format(sys.argv[0]))
 else:
     asyncio.get_event_loop().run_until_complete(set_autoconnect_mode(sys.argv[3]))
