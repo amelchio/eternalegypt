@@ -62,16 +62,15 @@ def autologin(function, timeout=TIMEOUT):
         try:
             async with asyncio.timeout(timeout):
                 return await function(self, *args, **kwargs)
-        except (asyncio.TimeoutError, ClientError, Error):
-            pass
+        except (asyncio.TimeoutError, ClientError, Error) as ex:
+            _LOGGER.debug("Operation failed (%s), attempting autologin", ex)
 
-        _LOGGER.debug("autologin")
         try:
             async with asyncio.timeout(timeout):
                 await self.login()
                 return await function(self, *args, **kwargs)
-        except (asyncio.TimeoutError, ClientError, Error):
-            raise Error(str(function))
+        except (asyncio.TimeoutError, ClientError, Error) as ex:
+            raise Error(f"Autologin failed ({ex}) for {str(function)}")
 
     return wrapper
 
@@ -120,12 +119,14 @@ class LB2120:
             async with asyncio.timeout(TIMEOUT):
                 url = self._url('model.json')
                 async with self.websession.get(url) as response:
-                    data = json.loads(await response.text())
-                    self.token = data.get('session', {}).get('secToken')
+                    try:
+                        data = json.loads(await response.text())
+                        self.token = data.get('session', {}).get('secToken')
+                    except json.decoder.JSONDecodeError as ex:
+                        pass
 
                     if self.token is None:
-                        _LOGGER.error("No token found during login")
-                        raise Error()
+                        raise Error("No token found during login")
 
                     _LOGGER.debug("Token: %s", self.token)
 
@@ -137,8 +138,8 @@ class LB2120:
                 async with self.websession.post(url, data=data) as response:
                     _LOGGER.debug("Got cookie with status %d", response.status)
 
-        except (asyncio.TimeoutError, ClientError, Error):
-            raise Error("Could not login")
+        except (asyncio.TimeoutError, ClientError, Error) as ex:
+            raise Error(f"Could not login ({ex})")
 
     @autologin
     async def sms(self, phone, message):
@@ -283,14 +284,24 @@ class LB2120:
         """Return the current information."""
         url = self._url('model.json')
         async with self.websession.get(url) as response:
-            data = json.loads(await response.text())
+            try:
+                text = await response.text()
+            except TimeoutError as ex:
+                _LOGGER.debug("Timeout while reading information (%s)", ex)
+                raise Error(ex)
+
+            try:
+                data = json.loads(text)
+            except json.decoder.JSONDecodeError as ex:
+                _LOGGER.debug("Failed to decode response (%s): %s", ex, text)
+                raise Error(ex)
 
             try:
                 result = self._build_information(data)
                 _LOGGER.debug("Did read information: %s", data)
             except KeyError as ex:
                 _LOGGER.debug("Failed to read information (%s): %s", ex, data)
-                raise Error()
+                raise Error(ex)
 
             self._sms_events(result)
 
