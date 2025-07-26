@@ -284,14 +284,24 @@ class LB2120:
         """Return the current information."""
         url = self._url('model.json')
         async with self.websession.get(url) as response:
-            data = json.loads(await response.text())
+            try:
+                text = await response.text()
+            except TimeoutError as ex:
+                _LOGGER.debug("Timeout while reading information (%s)", ex)
+                raise Error(ex)
+
+            try:
+                data = json.loads(text)
+            except json.decoder.JSONDecodeError as ex:
+                _LOGGER.debug("Failed to decode response (%s): %s", ex, text)
+                raise Error(ex)
 
             try:
                 result = self._build_information(data)
                 _LOGGER.debug("Did read information: %s", data)
             except KeyError as ex:
                 _LOGGER.debug("Failed to read information (%s): %s", ex, data)
-                raise Error()
+                raise Error(ex)
 
             self._sms_events(result)
 
