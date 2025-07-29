@@ -14,7 +14,6 @@ setup(
     license="MIT",
     keywords=["netgear,lte,lb1120,lb2120"],
     classifiers=[
-        "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3 :: Only",
     ],
