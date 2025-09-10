@@ -231,6 +231,50 @@ class LB2120:
         async with self._config_call('general.factoryReset', 1) as response:
             _LOGGER.debug("Factory reset %d", response.status)
 
+    @autologin
+    async def set_ip_pass_through_enabled(self, ipPassThroughEnabled=True):
+        """Set ipPassThroughEnabled on Netgear LM1200 using /Forms/config."""
+        ipPassThroughEnabled = "true" if ipPassThroughEnabled else "false"
+        data = {
+            "router.ipPassThroughEnabled": ipPassThroughEnabled,
+            "err_redirect": "/error.json",
+            "ok_redirect": "/success.json",
+            "token": self.token,
+            "general.shutdown": "Restart"
+        }
+        url = self._url("Forms/config")
+        async with self.websession.post(url, data=data) as response:
+            text = await response.text()
+            _LOGGER.debug("Set ipPassThroughEnabled %s returned status %d", ipPassThroughEnabled, response.status)
+            _LOGGER.debug("Response body: %s", text)
+            if response.status != 200 or "error" in text.lower():
+                raise Error("Could not set Bridge Mode")
+
+    @autologin
+    async def set_apn(self, apn, profile_index=1, profile_id=3, name="", authtype="None",
+                    username="", pdp_type="IPV4V6", roaming_type="IPV4"):
+        """Set APN on Netgear LM1200 using /Forms/profile."""
+        data = {
+            "action": "update",
+            "profile.index": str(profile_index),
+            "profile.id": str(profile_id),
+            "profile.name": name,
+            "profile.apn": apn,
+            "profile.authtype": authtype,
+            "profile.username": username,
+            "profile.type": pdp_type,
+            "profile.pdproamingtype": roaming_type,
+            "err_redirect": "/error.json",
+            "ok_redirect": "/success.json",
+            "token": self.token
+        }
+        url = self._url("Forms/profile")
+        async with self.websession.post(url, data=data) as response:
+            text = await response.text()
+            _LOGGER.debug("Set APN %d", response.status)
+            _LOGGER.debug("Response body: %s", text)
+            if response.status != 200 or "error" in text.lower():
+                raise Error("Could not set APN")
 
     def _build_information(self, data):
         """Read the bits we need from returned data."""
@@ -333,6 +377,9 @@ def flatten(obj, path=""):
     if isinstance(obj, dict):
         for key, item in obj.items():
             result.update(flatten(item, path=(path + "." if path else "") + key.lower()))
+    elif isinstance(obj, list):
+        for index, item in enumerate(obj):
+            result.update(flatten(item, path=(path + "." if path else "") + str(index)))
     elif isinstance(obj, (str, int, float, bool)):
         result[path] = obj
     return result
